@@ -2,20 +2,12 @@ import { createWorkflow, createStep } from '@mastra/core/workflows';
 import { z } from 'zod';
 import { githubFetch, mapPRResponse, fetchAllPRFiles, fetchFileContent, truncate } from '../lib/github';
 import { prIdentifierSchema, prSchema, fileSchema, fileReviewSchema, aggregateSummarySchema, reviewOutputSchema } from '../lib/schemas';
-import { SKIP_PATTERNS, MEDIUM_PR_MAX, getReviewDepth, MAX_CONTENT_CHARS_PER_FILE, MAX_PATCH_CHARS_PER_FILE } from '../lib/review-config';
-
-// ---------------------------------------------------------------------------
-// Workflow-specific batching constants
-// ---------------------------------------------------------------------------
+import { SKIP_PATTERNS, MEDIUM_PR_MAX, getReviewDepth, MAX_CONTENT_CHARS_PER_FILE, MAX_PATCH_CHARS_PER_FILE, MIN_DELETION_ONLY_LINES } from '../lib/review-config';
 
 /** Max total chars across all files in a single agent call (~30k tokens for Sonnet). */
 const BATCH_CHAR_BUDGET = 120_000;
 /** Max files per agent call. */
 const BATCH_FILE_LIMIT = 20;
-
-// ---------------------------------------------------------------------------
-// Inter-step schemas — base context passed through every step
-// ---------------------------------------------------------------------------
 
 const prBaseSchema = z.object({
   owner: z.string(),
@@ -27,10 +19,6 @@ const prBaseSchema = z.object({
 const prContextSchema = prBaseSchema.extend({ files: z.array(fileSchema) });
 const categorizedSchema = prBaseSchema.extend({ reviewableFiles: z.array(fileSchema), skippedFiles: z.array(z.string()) });
 const reviewedSchema = prBaseSchema.extend({ fileReviews: z.array(fileReviewSchema), skippedFiles: z.array(z.string()) });
-
-// ---------------------------------------------------------------------------
-// Step 1: Fetch PR context
-// ---------------------------------------------------------------------------
 
 const fetchPRContext = createStep({
   id: 'fetch-pr-context',
@@ -47,10 +35,6 @@ const fetchPRContext = createStep({
   },
 });
 
-// ---------------------------------------------------------------------------
-// Step 2: Categorize files
-// ---------------------------------------------------------------------------
-
 const categorizeFiles = createStep({
   id: 'categorize-files',
   description: 'Filter non-reviewable files',
@@ -63,7 +47,7 @@ const categorizeFiles = createStep({
     for (const file of inputData.files) {
       if (SKIP_PATTERNS.some((p) => p.test(file.filename))) {
         skippedFiles.push(file.filename);
-      } else if (file.additions === 0 && file.deletions < 50) {
+      } else if (file.additions === 0 && file.deletions < MIN_DELETION_ONLY_LINES) {
         skippedFiles.push(file.filename);
       } else {
         reviewableFiles.push(file);
@@ -74,10 +58,6 @@ const categorizeFiles = createStep({
     return { owner, repo, pullNumber, pr, reviewableFiles, skippedFiles };
   },
 });
-
-// ---------------------------------------------------------------------------
-// Step 3: Review files (batched)
-// ---------------------------------------------------------------------------
 
 type FileEntry = z.infer<typeof fileSchema> & { content: string };
 
@@ -165,11 +145,9 @@ For EACH file, return an entry with the filename and an array of issues found (e
     let allReviews: z.infer<typeof fileReviewSchema>[];
 
     if (isLargePR) {
-      // Large PRs: run all batches in parallel for speed
       const results = await Promise.all(batches.map((batch, i) => reviewBatch(batch, i)));
       allReviews = results.flat();
     } else {
-      // Small/medium PRs: sequential for precision (avoids rate limits, keeps context coherent)
       allReviews = [];
       for (let i = 0; i < batches.length; i++) {
         allReviews.push(...await reviewBatch(batches[i], i));
@@ -179,10 +157,6 @@ For EACH file, return an entry with the filename and an array of issues found (e
     return { owner, repo, pullNumber, pr, fileReviews: allReviews, skippedFiles };
   },
 });
-
-// ---------------------------------------------------------------------------
-// Step 4: Aggregate findings
-// ---------------------------------------------------------------------------
 
 const aggregateFindings = createStep({
   id: 'aggregate-findings',
@@ -241,10 +215,6 @@ Rules:
     return { ...summary, fileReviews, skippedFiles };
   },
 });
-
-// ---------------------------------------------------------------------------
-// Workflow
-// ---------------------------------------------------------------------------
 
 export const prReviewWorkflow = createWorkflow({
   id: 'pr-review-workflow',

@@ -2,10 +2,6 @@
  * Shared review configuration — file skip patterns, review depth thresholds, and content limits.
  */
 
-// ---------------------------------------------------------------------------
-// Files to skip during review (used by tools and workflow)
-// ---------------------------------------------------------------------------
-
 export const SKIP_PATTERNS = [
   /\.lock$/,
   /\.lockb$/,
@@ -21,10 +17,6 @@ export const SKIP_PATTERNS = [
   /\.generated\./,
   /__snapshots__\//,
 ];
-
-// ---------------------------------------------------------------------------
-// Adaptive review depth
-// ---------------------------------------------------------------------------
 
 export const SMALL_PR_MAX = 6;
 export const MEDIUM_PR_MAX = 20;
@@ -43,9 +35,7 @@ export const REVIEW_DEPTH_INSTRUCTIONS = `- **Small PRs (1–${SMALL_PR_MAX} fil
 - **Medium PRs (${SMALL_PR_MAX + 1}–${MEDIUM_PR_MAX} files):** Focus on logic correctness and architectural decisions. Call out key issues but don't nitpick every line.
 - **Large PRs (${MEDIUM_PR_MAX + 1}+ files):** Provide a high-level architecture review. Focus only on critical issues — bugs, security vulnerabilities, and major design concerns.`;
 
-// ---------------------------------------------------------------------------
-// Per-file content limits (used by tools AND workflow)
-// ---------------------------------------------------------------------------
-
 export const MAX_CONTENT_CHARS_PER_FILE = 4_000;
 export const MAX_PATCH_CHARS_PER_FILE = 3_000;
+export const MAX_DIFF_CHARS = 80_000;
+export const MIN_DELETION_ONLY_LINES = 50;

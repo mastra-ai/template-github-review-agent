@@ -2,11 +2,7 @@ import { createTool } from '@mastra/core/tools';
 import { z } from 'zod';
 import { githubFetch, mapPRResponse, fetchAllPRFiles, fetchFileContent, truncate } from '../lib/github';
 import { prIdentifierSchema, prSchema, fileSchema } from '../lib/schemas';
-import { SKIP_PATTERNS, MAX_PATCH_CHARS_PER_FILE, MAX_CONTENT_CHARS_PER_FILE } from '../lib/review-config';
-
-// ---------------------------------------------------------------------------
-// 1. parseGitHubPRUrl
-// ---------------------------------------------------------------------------
+import { SKIP_PATTERNS, MAX_PATCH_CHARS_PER_FILE, MAX_CONTENT_CHARS_PER_FILE, MAX_DIFF_CHARS } from '../lib/review-config';
 
 export const parseGitHubPRUrl = createTool({
   id: 'parse-github-pr-url',
@@ -33,10 +29,6 @@ export const parseGitHubPRUrl = createTool({
   },
 });
 
-// ---------------------------------------------------------------------------
-// 2. getPullRequest
-// ---------------------------------------------------------------------------
-
 export const getPullRequest = createTool({
   id: 'get-pull-request',
   description:
@@ -50,12 +42,6 @@ export const getPullRequest = createTool({
     return mapPRResponse(data);
   },
 });
-
-// ---------------------------------------------------------------------------
-// 3. getPullRequestDiff
-// ---------------------------------------------------------------------------
-
-const MAX_DIFF_CHARS = 80_000;
 
 export const getPullRequestDiff = createTool({
   id: 'get-pull-request-diff',
@@ -84,10 +70,6 @@ export const getPullRequestDiff = createTool({
     return { diff, truncated: false };
   },
 });
-
-// ---------------------------------------------------------------------------
-// 4. getPullRequestFiles
-// ---------------------------------------------------------------------------
 
 const FILES_PER_PAGE = 30;
 
@@ -131,10 +113,6 @@ export const getPullRequestFiles = createTool({
     };
   },
 });
-
-// ---------------------------------------------------------------------------
-// 5. getFileContent
-// ---------------------------------------------------------------------------
 
 export const getFileContent = createTool({
   id: 'get-file-content',

@@ -2,19 +2,11 @@
  * Shared GitHub API utilities — fetch helper, response mappers, and file content fetcher.
  */
 
-// ---------------------------------------------------------------------------
-// Generic helpers
-// ---------------------------------------------------------------------------
-
 /** Truncate text to `max` chars, appending a notice if trimmed. */
 export function truncate(text: string, max: number): string {
   if (text.length <= max) return text;
   return text.slice(0, max) + '\n... [truncated]';
 }
-
-// ---------------------------------------------------------------------------
-// Authenticated GitHub API fetch
-// ---------------------------------------------------------------------------
 
 export async function githubFetch(
   path: string,
@@ -38,12 +30,6 @@ export async function githubFetch(
 
   return response;
 }
-
-// ---------------------------------------------------------------------------
-// Response mappers — normalize raw GitHub API JSON into our domain shapes
-// ---------------------------------------------------------------------------
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 export function mapPRResponse(data: any) {
   return {
@@ -74,8 +60,6 @@ export function mapFilesResponse(data: any[]) {
   }));
 }
 
-/* eslint-enable @typescript-eslint/no-explicit-any */
-
 /**
  * Fetch ALL files for a PR with automatic pagination (GitHub returns max 100 per page).
  */
@@ -97,11 +81,6 @@ export async function fetchAllPRFiles(owner: string, repo: string, pullNumber: n
   return allFiles;
 }
 
-// ---------------------------------------------------------------------------
-// Fetch file content from GitHub contents API + base64 decode
-// Returns null on 404 (deleted branch, removed file, etc.)
-// ---------------------------------------------------------------------------
-
 export async function fetchFileContent(
   owner: string,
   repo: string,
@@ -114,7 +93,6 @@ export async function fetchFileContent(
       `/repos/${owner}/${repo}/contents/${path}?ref=${encodeURIComponent(ref)}`,
     );
   } catch (err) {
-    // githubFetch throws on non-OK responses; treat 404 as null
     if (err instanceof Error && err.message.includes('404')) return null;
     throw err;
   }

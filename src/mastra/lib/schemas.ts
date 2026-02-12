@@ -4,19 +4,11 @@
 
 import { z } from 'zod';
 
-// ---------------------------------------------------------------------------
-// GitHub PR identifier — { owner, repo, pullNumber }
-// ---------------------------------------------------------------------------
-
 export const prIdentifierSchema = z.object({
   owner: z.string().describe('Repository owner (user or organization)'),
   repo: z.string().describe('Repository name'),
   pullNumber: z.number().describe('Pull request number'),
 });
-
-// ---------------------------------------------------------------------------
-// PR metadata
-// ---------------------------------------------------------------------------
 
 export const prSchema = z.object({
   title: z.string(),
@@ -34,10 +26,6 @@ export const prSchema = z.object({
   changedFiles: z.number(),
 });
 
-// ---------------------------------------------------------------------------
-// Changed file entry
-// ---------------------------------------------------------------------------
-
 export const fileSchema = z.object({
   filename: z.string(),
   status: z.string(),
@@ -46,10 +34,6 @@ export const fileSchema = z.object({
   changes: z.number(),
   patch: z.string().optional(),
 });
-
-// ---------------------------------------------------------------------------
-// Per-file review result
-// ---------------------------------------------------------------------------
 
 export const fileReviewSchema = z.object({
   filename: z.string(),
@@ -63,10 +47,6 @@ export const fileReviewSchema = z.object({
   ),
 });
 
-// ---------------------------------------------------------------------------
-// Aggregated review — agent-produced summary (without step-injected fields)
-// ---------------------------------------------------------------------------
-
 export const aggregateSummarySchema = z.object({
   summary: z.string(),
   qualityScore: z.number(),
@@ -77,10 +57,6 @@ export const aggregateSummarySchema = z.object({
   suggestions: z.array(z.string()),
   positiveNotes: z.array(z.string()),
 });
-
-// ---------------------------------------------------------------------------
-// Full review output (agent summary + step-injected fileReviews/skippedFiles)
-// ---------------------------------------------------------------------------
 
 export const reviewOutputSchema = aggregateSummarySchema.extend({
   fileReviews: z.array(fileReviewSchema),

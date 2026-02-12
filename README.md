@@ -31,13 +31,39 @@ Start the dev server:
 pnpm run dev
 ```
 
-Open [http://localhost:4111](http://localhost:4111) to access Mastra Studio. You can interact with the **GitHub PR Code Reviewer** agent directly — give it a PR URL like:
+Open [http://localhost:4111](http://localhost:4111) to access Mastra Studio.
+
+### Agent (Chat)
+
+Open the **GitHub PR Code Reviewer** agent and give it a PR URL:
 
 ```
 Review this PR: https://github.com/owner/repo/pull/123
 ```
 
-You can also run the **pr-review-workflow** directly from the Workflows tab by providing `owner`, `repo`, and `pullNumber`.
+The agent (Claude Opus) will fetch the PR, adaptively page through files based on PR size, and return a structured review. It handles small, medium, and large PRs differently to stay within context limits.
+
+### Workflow
+
+Open the **Workflows** tab and run **pr-review-workflow** with `owner`, `repo`, and `pullNumber` inputs. The workflow runs a fixed 4-step pipeline and returns a structured JSON review.
+
+## Customization
+
+### Change Review Standards
+
+Edit the files in `workspace/skills/` to match your team's conventions. The `SKILL.md` files define the review process; the `references/` files provide detailed checklists.
+
+### Adjust Thresholds
+
+Edit `src/mastra/lib/review-config.ts`:
+
+- `SMALL_PR_MAX` / `MEDIUM_PR_MAX` — PR size breakpoints for adaptive review depth.
+- `MAX_CONTENT_CHARS_PER_FILE` / `MAX_PATCH_CHARS_PER_FILE` — Per-file truncation limits.
+- `SKIP_PATTERNS` — Regex patterns for files to skip during review.
+
+### Swap Models
+
+Change the `model` field in the agent files. The code-review-agent uses Opus for quality; the workflow-review-agent uses Sonnet for speed. Any Anthropic model works, or switch to another provider supported by Mastra.
 
 ## Deployment
 
