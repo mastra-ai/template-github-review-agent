@@ -1,27 +1,55 @@
-# template-github-review-agent
+# GitHub PR Code Review Agent
 
-Welcome to your new [Mastra](https://mastra.ai/) project! We're excited to see what you'll build.
+An AI-powered code review agent built with [Mastra](https://mastra.ai/) that analyzes any GitHub pull request and returns detailed feedback directly in chat. It uses a structured workflow, workspace skills for review standards, and adaptive review depth based on PR size.
 
-## Getting Started
+## Prerequisites
 
-Start the development server:
+- Node.js >= 22.13.0
+- pnpm
+- A [GitHub Personal Access Token](https://github.com/settings/tokens) (read-only scope)
+- An [Anthropic API Key](https://console.anthropic.com/)
+
+## Setup
+
+```shell
+pnpm install
+cp .env.example .env
+```
+
+Fill in your `.env`:
+
+```
+GITHUB_TOKEN=ghp_...
+ANTHROPIC_API_KEY=sk-ant-...
+```
+
+## Usage
+
+Start the dev server:
 
 ```shell
 pnpm run dev
 ```
 
-Open [http://localhost:4111](http://localhost:4111) in your browser to access [Mastra Studio](https://mastra.ai/docs/getting-started/studio). It provides an interactive UI for building and testing your agents, along with a REST API that exposes your Mastra application as a local service. This lets you start building without worrying about integration right away.
+Open [http://localhost:4111](http://localhost:4111) to access Mastra Studio. You can interact with the **GitHub PR Code Reviewer** agent directly — give it a PR URL like:
 
-You can start editing files inside the `src/mastra` directory. The development server will automatically reload whenever you make changes.
+```
+Review this PR: https://github.com/owner/repo/pull/123
+```
 
-## Learn more
+You can also run the **pr-review-workflow** directly from the Workflows tab by providing `owner`, `repo`, and `pullNumber`.
 
-To learn more about Mastra, visit our [documentation](https://mastra.ai/docs/). Your bootstrapped project includes example code for [agents](https://mastra.ai/docs/agents/overview), [tools](https://mastra.ai/docs/agents/using-tools), [workflows](https://mastra.ai/docs/workflows/overview), [scorers](https://mastra.ai/docs/evals/overview), and [observability](https://mastra.ai/docs/observability/overview).
+## Deployment
 
-If you're new to AI agents, check out our [course](https://mastra.ai/course) and [YouTube videos](https://youtube.com/@mastra-ai). You can also join our [Discord](https://discord.gg/BTYqqHKUrf) community to get help and share your projects.
+```shell
+pnpm run build
+pnpm run start
+```
 
-## Deploy on Mastra Cloud
+Or deploy to [Mastra Cloud](https://cloud.mastra.ai/) — see the [deployment guide](https://mastra.ai/docs/deployment/overview).
 
-[Mastra Cloud](https://cloud.mastra.ai/) gives you a serverless agent environment with atomic deployments. Access your agents from anywhere and monitor performance. Make sure they don't go off the rails with evals and tracing.
+## Learn More
 
-Check out the [deployment guide](https://mastra.ai/docs/deployment/overview) for more details.
+- [Mastra Documentation](https://mastra.ai/docs/)
+- [Agents](https://mastra.ai/docs/agents/overview) · [Tools](https://mastra.ai/docs/agents/using-tools) · [Workflows](https://mastra.ai/docs/workflows/overview) · [Workspace Skills](https://mastra.ai/docs/agents/workspace)
+- [Discord](https://discord.gg/BTYqqHKUrf)
