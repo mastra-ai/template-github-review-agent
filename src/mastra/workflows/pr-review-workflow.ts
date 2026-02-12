@@ -129,17 +129,14 @@ const reviewFiles = createStep({
       : reviewableFiles.map((f) => ({ ...f, content: '' }));
 
     const batches = batchFiles(entries, includeContent);
-    const allReviews: z.infer<typeof fileReviewSchema>[] = [];
+    const isLargePR = reviewableFiles.length > MEDIUM_PR_MAX;
 
-    for (let i = 0; i < batches.length; i++) {
-      const batch = batches[i];
+    function buildPrompt(batch: FileEntry[], batchIndex: number): string {
       const label = batches.length === 1
         ? `Files to Review (${entries.length} files)`
-        : `Batch ${i + 1}/${batches.length} (${batch.length} files)`;
-
+        : `Batch ${batchIndex + 1}/${batches.length} (${batch.length} files)`;
       const sections = batch.map((f) => buildFileSection(f, includeContent)).join('\n---\n\n');
-
-      const prompt = `Review the following PR files. Apply all workspace skills (code-standards, security-review, performance-review).
+      return `Review the following PR files. Apply all workspace skills (code-standards, security-review, performance-review).
 
 ## PR Context
 - **Title:** ${pr.title}
@@ -156,11 +153,27 @@ ${reviewDepth}
 ${sections}
 
 For EACH file, return an entry with the filename and an array of issues found (empty array if none). Be specific with line numbers from the diff.`;
+    }
 
-      const response = await agent.generate(prompt, {
+    async function reviewBatch(batch: FileEntry[], idx: number) {
+      const response = await agent.generate(buildPrompt(batch, idx), {
         structuredOutput: { schema: z.array(fileReviewSchema) },
       });
-      allReviews.push(...(response.object ?? []));
+      return response.object ?? [];
+    }
+
+    let allReviews: z.infer<typeof fileReviewSchema>[];
+
+    if (isLargePR) {
+      // Large PRs: run all batches in parallel for speed
+      const results = await Promise.all(batches.map((batch, i) => reviewBatch(batch, i)));
+      allReviews = results.flat();
+    } else {
+      // Small/medium PRs: sequential for precision (avoids rate limits, keeps context coherent)
+      allReviews = [];
+      for (let i = 0; i < batches.length; i++) {
+        allReviews.push(...await reviewBatch(batches[i], i));
+      }
     }
 
     return { owner, repo, pullNumber, pr, fileReviews: allReviews, skippedFiles };
