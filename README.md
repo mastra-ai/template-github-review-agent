@@ -63,7 +63,7 @@ Edit `src/mastra/lib/review-config.ts`:
 
 ### Swap Models
 
-Change the `model` field in the agent files. The code-review-agent uses Opus for quality; the workflow-review-agent uses Sonnet for speed. Any Anthropic model works, or switch to another provider supported by Mastra.
+Change the `model` field in the agent files. The code-review-agent uses Opus for quality; the workflow-review-agent uses Haiku for speed. Any Anthropic model works, or switch to another provider supported by Mastra.
 
 ## Deployment
 

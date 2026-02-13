@@ -2,12 +2,6 @@
  * Shared GitHub API utilities — fetch helper, response mappers, and file content fetcher.
  */
 
-/** Truncate text to `max` chars, appending a notice if trimmed. */
-export function truncate(text: string, max: number): string {
-  if (text.length <= max) return text;
-  return text.slice(0, max) + '\n... [truncated]';
-}
-
 export async function githubFetch(
   path: string,
   accept = 'application/vnd.github.v3+json',

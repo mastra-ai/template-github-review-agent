@@ -4,14 +4,14 @@ import { Agent } from '@mastra/core/agent';
  * Lightweight reviewer used exclusively by the PR review workflow.
  *
  * Key differences from the main `codeReviewAgent`:
- * - Uses Sonnet (faster, cheaper) instead of Opus.
+ * - Uses Haiku (faster, cheaper) instead of Opus.
  * - Has NO tools — the workflow feeds it data directly.
  * - Focused instructions for structured review output only.
  */
 export const workflowReviewAgent = new Agent({
   id: 'workflow-review-agent',
   name: 'Workflow PR Reviewer',
-  model: 'anthropic/claude-sonnet-4-20250514',
+  model: 'anthropic/claude-haiku-4-5',
   instructions: `You are an expert code reviewer. You receive PR file diffs and contents from a workflow and return structured review findings.
 
 ## Review Focus

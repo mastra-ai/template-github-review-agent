@@ -95,5 +95,11 @@ Good patterns, clean abstractions, thoughtful decisions, or well-written tests w
     getPullRequestFiles,
     getFileContent,
   },
-  memory: new Memory()
+  memory: new Memory({
+    options: {
+      observationalMemory: {
+        model: 'anthropic/claude-haiku-4-5'
+      }
+    }
+  })
 });

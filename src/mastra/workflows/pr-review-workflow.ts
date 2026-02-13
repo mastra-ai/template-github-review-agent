@@ -1,13 +1,13 @@
 import { createWorkflow, createStep } from '@mastra/core/workflows';
 import { z } from 'zod';
-import { githubFetch, mapPRResponse, fetchAllPRFiles, fetchFileContent, truncate } from '../lib/github';
+import { githubFetch, mapPRResponse, fetchAllPRFiles, fetchFileContent } from '../lib/github';
 import { prIdentifierSchema, prSchema, fileSchema, fileReviewSchema, aggregateSummarySchema, reviewOutputSchema } from '../lib/schemas';
-import { SKIP_PATTERNS, MEDIUM_PR_MAX, getReviewDepth, MAX_CONTENT_CHARS_PER_FILE, MAX_PATCH_CHARS_PER_FILE, MIN_DELETION_ONLY_LINES } from '../lib/review-config';
+import { SKIP_PATTERNS, MEDIUM_PR_MAX, getReviewDepth, MIN_DELETION_ONLY_LINES } from '../lib/review-config';
 
-/** Max total chars across all files in a single agent call (~30k tokens for Sonnet). */
-const BATCH_CHAR_BUDGET = 120_000;
+/** Max total chars across all files in a single agent call. */
+const BATCH_CHAR_BUDGET = 400_000;
 /** Max files per agent call. */
-const BATCH_FILE_LIMIT = 20;
+const BATCH_FILE_LIMIT = 40;
 
 const prBaseSchema = z.object({
   owner: z.string(),
@@ -63,8 +63,8 @@ type FileEntry = z.infer<typeof fileSchema> & { content: string };
 
 function buildFileSection(f: FileEntry, includeContent: boolean): string {
   let s = `### ${f.filename} (${f.status}, +${f.additions}/-${f.deletions})\n`;
-  if (f.patch) s += `\n**Diff:**\n\`\`\`diff\n${truncate(f.patch, MAX_PATCH_CHARS_PER_FILE)}\n\`\`\`\n`;
-  if (includeContent && f.content) s += `\n**Full file:**\n\`\`\`\n${truncate(f.content, MAX_CONTENT_CHARS_PER_FILE)}\n\`\`\`\n`;
+  if (f.patch) s += `\n**Diff:**\n\`\`\`diff\n${f.patch}\n\`\`\`\n`;
+  if (includeContent && f.content) s += `\n**Full file:**\n\`\`\`\n${f.content}\n\`\`\`\n`;
   return s;
 }
 
