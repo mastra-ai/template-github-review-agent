@@ -1,4 +1,4 @@
-import { Agent } from '@mastra/core/agent';
+import { Agent } from '@mastra/core/agent'
 
 /**
  * Lightweight reviewer used exclusively by the PR review workflow.
@@ -29,4 +29,4 @@ Apply ALL of the following review lenses to every file:
 - Acknowledge good patterns when you see them (use the "positive" severity).
 - Be concise — the workflow aggregates your output across multiple batches.
 - When the review depth says "HIGH-LEVEL", skip minor style issues entirely.`,
-});
+})

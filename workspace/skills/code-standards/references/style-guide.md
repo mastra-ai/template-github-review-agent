@@ -2,14 +2,14 @@
 
 ## Naming Conventions
 
-| Element | Convention | Example |
-|---------|-----------|---------|
-| Variables & Functions | camelCase | `getUserName`, `isActive` |
-| Constants | UPPER_SNAKE_CASE | `MAX_RETRIES`, `API_BASE_URL` |
-| Classes & Types | PascalCase | `UserService`, `PullRequestData` |
-| Files | kebab-case | `user-service.ts`, `pr-review.ts` |
-| Booleans | is/has/should prefix | `isValid`, `hasPermission`, `shouldRetry` |
-| Event handlers | handle/on prefix | `handleClick`, `onSubmit` |
+| Element               | Convention           | Example                                   |
+| --------------------- | -------------------- | ----------------------------------------- |
+| Variables & Functions | camelCase            | `getUserName`, `isActive`                 |
+| Constants             | UPPER_SNAKE_CASE     | `MAX_RETRIES`, `API_BASE_URL`             |
+| Classes & Types       | PascalCase           | `UserService`, `PullRequestData`          |
+| Files                 | kebab-case           | `user-service.ts`, `pr-review.ts`         |
+| Booleans              | is/has/should prefix | `isValid`, `hasPermission`, `shouldRetry` |
+| Event handlers        | handle/on prefix     | `handleClick`, `onSubmit`                 |
 
 ## Code Organization
 
@@ -26,16 +26,16 @@ Order sections within a file:
 
 ```typescript
 // 1. Node built-ins
-import { resolve } from 'node:path';
+import { resolve } from 'node:path'
 
 // 2. External packages
-import { z } from 'zod';
+import { z } from 'zod'
 
 // 3. Internal/project imports
-import { myUtil } from '@/utils';
+import { myUtil } from '@/utils'
 
 // 4. Relative imports
-import { helper } from './helper';
+import { helper } from './helper'
 ```
 
 ## Error Handling

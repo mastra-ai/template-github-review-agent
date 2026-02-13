@@ -17,7 +17,7 @@ When reviewing code for performance issues, check each category below. Reference
 - N+1 query patterns (queries inside loops)
 - Missing database indexes for frequently queried fields
 - Unbounded queries without LIMIT/pagination
-- SELECT * instead of selecting only needed columns
+- SELECT \* instead of selecting only needed columns
 - Missing connection pooling
 
 ## Memory & Resources

@@ -1,13 +1,17 @@
-import { Agent } from '@mastra/core/agent';
-import { Memory } from '@mastra/memory';
+import { Agent } from '@mastra/core/agent'
+import { Memory } from '@mastra/memory'
 import {
   parseGitHubPRUrl,
   getPullRequest,
   getPullRequestDiff,
   getPullRequestFiles,
   getFileContent,
-} from '../tools/github';
-import { REVIEW_DEPTH_INSTRUCTIONS, SMALL_PR_MAX, MEDIUM_PR_MAX } from '../lib/review-config';
+} from '../tools/github'
+import {
+  REVIEW_DEPTH_INSTRUCTIONS,
+  SMALL_PR_MAX,
+  MEDIUM_PR_MAX,
+} from '../lib/review-config'
 
 export const codeReviewAgent = new Agent({
   id: 'code-review-agent',
@@ -98,8 +102,8 @@ Good patterns, clean abstractions, thoughtful decisions, or well-written tests w
   memory: new Memory({
     options: {
       observationalMemory: {
-        model: 'anthropic/claude-haiku-4-5'
-      }
-    }
-  })
-});
+        model: 'anthropic/claude-haiku-4-5',
+      },
+    },
+  }),
+})
