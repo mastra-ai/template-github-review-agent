@@ -1,6 +1,6 @@
 # GitHub PR Code Review Agent
 
-An AI-powered code review agent built with [Mastra](https://mastra.ai/) that analyzes any GitHub pull request and returns detailed feedback directly in chat. It uses a structured workflow, workspace skills for review standards, and adaptive review depth based on PR size.
+An AI-powered code review agent built with [Mastra](https://mastra.ai/) that analyzes any GitHub pull request and returns detailed feedback directly in chat. It uses a structured workflow, workspace skills for review standards, observational memory for managing context across large PRs, and adaptive review depth based on PR size.
 
 ## Prerequisites
 
@@ -41,7 +41,7 @@ Open the **GitHub PR Code Reviewer** agent and give it a PR URL:
 Review this PR: https://github.com/owner/repo/pull/123
 ```
 
-The agent (Claude Opus) will fetch the PR, adaptively page through files based on PR size, and return a structured review. It handles small, medium, and large PRs differently to stay within context limits.
+The agent (Claude Opus) will fetch the PR, adaptively page through files based on PR size, and return a structured review. Observational memory compresses tool results between turns, allowing the agent to handle large PRs without truncating data.
 
 ### Workflow
 
@@ -58,12 +58,17 @@ Edit the files in `workspace/skills/` to match your team's conventions. The `SKI
 Edit `src/mastra/lib/review-config.ts`:
 
 - `SMALL_PR_MAX` / `MEDIUM_PR_MAX` — PR size breakpoints for adaptive review depth.
-- `MAX_CONTENT_CHARS_PER_FILE` / `MAX_PATCH_CHARS_PER_FILE` — Per-file truncation limits.
 - `SKIP_PATTERNS` — Regex patterns for files to skip during review.
+- `MIN_DELETION_ONLY_LINES` — Threshold for skipping deletion-only files.
+
+Batch sizes for the workflow are configured at the top of `src/mastra/workflows/pr-review-workflow.ts`:
+
+- `BATCH_CHAR_BUDGET` — Max total characters per agent call (default: 400k).
+- `BATCH_FILE_LIMIT` — Max files per agent call (default: 40).
 
 ### Swap Models
 
-Change the `model` field in the agent files. The code-review-agent uses Opus for quality; the workflow-review-agent uses Haiku for speed. Any Anthropic model works, or switch to another provider supported by Mastra.
+Change the `model` field in the agent files. The `code-review-agent` uses Opus for quality; the `workflow-review-agent` uses Haiku for speed. Any Anthropic model works, or switch to another provider supported by Mastra.
 
 ## Deployment
 
@@ -73,9 +78,3 @@ pnpm run start
 ```
 
 Or deploy to [Mastra Cloud](https://cloud.mastra.ai/) — see the [deployment guide](https://mastra.ai/docs/deployment/overview).
-
-## Learn More
-
-- [Mastra Documentation](https://mastra.ai/docs/)
-- [Agents](https://mastra.ai/docs/agents/overview) · [Tools](https://mastra.ai/docs/agents/using-tools) · [Workflows](https://mastra.ai/docs/workflows/overview) · [Workspace Skills](https://mastra.ai/docs/agents/workspace)
-- [Discord](https://discord.gg/BTYqqHKUrf)
